@@ -6,12 +6,13 @@ use ethcore::encoded::Header as EthHeader;
 
 use serde::{Serialize, Serializer};
 use serde::ser::Error;
-use v1::types::{Bytes, Transaction, H160, H256, H2048, U256, Receipt};
+use v1::types::{Bytes, Transaction, H160, H256, H2048, U256, Receipt, LocalizedTrace};
 
 #[derive(Debug, Serialize)]
 pub struct TransactionWithReceipt {
 	pub transaction: Transaction,
-	pub receipt: Receipt
+	pub receipt: Receipt,
+	pub traces: Vec<LocalizedTrace>
 }
 
 /// Block representation
