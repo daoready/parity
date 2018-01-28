@@ -74,6 +74,8 @@ pub enum Api {
 	Whisper,
 	/// Whisper Pub-Sub (Safe but same concerns as above).
 	WhisperPubSub,
+	/// Bulk API
+	Bulk
 }
 
 impl FromStr for Api {
@@ -94,6 +96,7 @@ impl FromStr for Api {
 			"parity_accounts" => Ok(ParityAccounts),
 			"parity_set" => Ok(ParitySet),
 			"traces" => Ok(Traces),
+			"bulk" => Ok(Bulk),
 			"rpc" => Ok(Rpc),
 			"secretstore" => Ok(SecretStore),
 			"shh" => Ok(Whisper),
@@ -179,6 +182,7 @@ fn to_modules(apis: &HashSet<Api>) -> BTreeMap<String, String> {
 			Api::ParityPubSub => ("parity_pubsub", "1.0"),
 			Api::ParitySet => ("parity_set", "1.0"),
 			Api::Traces => ("traces", "1.0"),
+			Api::Bulk => ("bulk", "1.0"),
 			Api::Rpc => ("rpc", "1.0"),
 			Api::SecretStore => ("secretstore", "1.0"),
 			Api::Whisper => ("shh", "1.0"),
@@ -290,6 +294,9 @@ impl FullDependencies {
 
 						add_signing_methods!(EthSigning, handler, self, nonces.clone());
 					}
+				},
+				Api::Bulk => {
+					handler.extend_with(BulkClient::new(&self.client).to_delegate());
 				},
 				Api::EthPubSub => {
 					if !for_generic_pubsub {
@@ -491,6 +498,23 @@ impl<C: LightChainClient + 'static> LightDependencies<C> {
 						add_signing_methods!(EthSigning, handler, self);
 					}
 				},
+				Api::Bulk => {
+					let client = light::EthClient::new(
+						self.sync.clone(),
+						self.client.clone(),
+						self.on_demand.clone(),
+						self.transaction_queue.clone(),
+						self.secret_store.clone(),
+						self.cache.clone(),
+						self.gas_price_percentile,
+					);
+					handler.extend_with(Eth::to_delegate(client.clone()));
+
+					if !for_generic_pubsub {
+						handler.extend_with(EthFilter::to_delegate(client));
+						add_signing_methods!(EthSigning, handler, self);
+					}
+				},
 				Api::EthPubSub => {
 					let client = EthPubSubClient::light(
 						self.client.clone(),
@@ -613,6 +637,7 @@ impl ApiSet {
 			Api::SecretStore,
 			Api::Whisper,
 			Api::WhisperPubSub,
+			Api::Bulk
 		].into_iter().cloned().collect();
 
 		match *self {
