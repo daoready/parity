@@ -18,7 +18,7 @@
 use jsonrpc_core::{BoxFuture, Error};
 use jsonrpc_macros::Trailing;
 
-use v1::types::{RichBlock, BlockNumber, Bytes, CallRequest, Filter, FilterChanges, Index};
+use v1::types::{RichBlock, BlockNumber, Bytes, CallRequest, Filter, FilterChanges, Index, BlockWithTransactions};
 use v1::types::{Log, Receipt, SyncStatus, Transaction, Work};
 use v1::types::{H64, H160, H256, U256};
 
@@ -29,7 +29,7 @@ build_rpc_trait! {
 
 		/// Returns block with given number.
 		#[rpc(name = "bulk_getBlockByNumber")]
-		fn block_by_number(&self, BlockNumber) -> BoxFuture<Option<RichBlock>, Error>;
+		fn block_by_number(&self, BlockNumber) -> BoxFuture<Option<BlockWithTransactions>, Error>;
 
 
 	}

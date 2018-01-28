@@ -20,6 +20,7 @@
 mod account_info;
 mod block;
 mod block_number;
+mod block_with_transactions;
 mod bytes;
 mod call_request;
 mod confirmations;
@@ -50,6 +51,7 @@ pub use self::account_info::{AccountInfo, ExtAccountInfo, HwAccountInfo};
 pub use self::bytes::Bytes;
 pub use self::block::{RichBlock, Block, BlockTransactions, Header, RichHeader, Rich};
 pub use self::block_number::BlockNumber;
+pub use self::block_with_transactions::BlockWithTransactions;
 pub use self::call_request::CallRequest;
 pub use self::confirmations::{
 	ConfirmationPayload, ConfirmationRequest, ConfirmationResponse, ConfirmationResponseWithToken,
