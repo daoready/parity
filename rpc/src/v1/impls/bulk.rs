@@ -50,7 +50,7 @@ use v1::helpers::block_import::is_major_importing;
 use v1::helpers::accounts::unwrap_provider;
 use v1::traits::Bulk;
 use v1::types::{
-	RichBlock, Block, BlockTransactions, BlockNumber, Bytes, SyncStatus, SyncInfo, BlockWithTransactions,
+	RichBlock, Block, BlockTransactions, BlockNumber, Bytes, SyncStatus, SyncInfo, BlockWithTransactions,TransactionWithReceipt,
 	Transaction, CallRequest, Index, Filter, Log, Receipt, Work,
 	H64 as RpcH64, H256 as RpcH256, H160 as RpcH160, U256 as RpcU256,
 };
@@ -102,7 +102,15 @@ impl<C> BulkClient<C> where
 						total_difficulty: Some(total_difficulty.into()),
 						seal_fields: view.seal().into_iter().map(Into::into).collect(),
 						uncles: block.uncle_hashes().into_iter().map(Into::into).collect(),
-						transactions: block.view().localized_transactions().into_iter().map(|t| Transaction::from_localized(t, self.eip86_transition)).collect(),
+						transactions: block.view().localized_transactions().into_iter().map(|t|
+							{
+								let hash = TransactionId::Hash(t.hash().into());
+								TransactionWithReceipt {
+									transaction: Transaction::from_localized(t, self.eip86_transition),
+									receipt: self.client.transaction_receipt(hash).unwrap().into()
+								}
+							}
+						).collect(),
 						extra_data: Bytes::new(view.extra_data()),
 					}
 				))
