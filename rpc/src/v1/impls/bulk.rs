@@ -130,7 +130,7 @@ impl<C> Bulk for BulkClient<C> where
 {
 	type Metadata = Metadata;
 
-	fn block_by_number(&self, num: BlockNumber) -> BoxFuture<Option<BlockWithTransactions>, Error> {
+	fn block_by_number(&self, num: BlockNumber) -> BoxFuture<Option<BlockWithTransactions>> {
 		Box::new(future::done(self.block(num.into())))
 	}
 

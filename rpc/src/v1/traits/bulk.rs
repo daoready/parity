@@ -29,7 +29,7 @@ build_rpc_trait! {
 
 		/// Returns block with given number.
 		#[rpc(name = "bulk_getBlockByNumber")]
-		fn block_by_number(&self, BlockNumber) -> BoxFuture<Option<BlockWithTransactions>, Error>;
+		fn block_by_number(&self, BlockNumber) -> BoxFuture<Option<BlockWithTransactions>>;
 
 
 	}
